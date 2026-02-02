@@ -105,6 +105,10 @@
                         <input type="text" id="reg-id" required placeholder="Student ID (FA21-BCS-000)" class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none">
                         <input type="email" id="reg-email" required placeholder="Email Address" class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none">
                         <input type="tel" id="reg-phone" required placeholder="Phone Number" class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none">
+                        <div id="reg-pay-section" class="md:col-span-2 hidden">
+                            <label class="block text-[10px] font-black uppercase text-rose-400 tracking-widest mb-3">Upload Payment Receipt (Screenshot)</label>
+                            <input type="file" id="reg-pay-file" accept="image/*" class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none">
+                        </div>
                     </div>
                     <button type="submit" class="w-full bg-indigo-600 text-white orbitron font-bold py-5 rounded-2xl uppercase tracking-widest hover:bg-indigo-500 transition">Submit Registration</button>
                 </form>
@@ -162,6 +166,10 @@
                             <input type="datetime-local" id="ev-deadline" required class="px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white">
                             <input type="text" id="ev-location" placeholder="Location (Hall A, Lab 1 etc.)" required class="md:col-span-3 px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none">
                             <textarea id="ev-desc" placeholder="Event Description..." required class="md:col-span-3 px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white h-24 outline-none"></textarea>
+                            <div class="md:col-span-3 flex items-center space-x-3 bg-white/5 p-4 rounded-2xl border border-white/10">
+                                <input type="checkbox" id="ev-pay-required" class="w-5 h-5 accent-indigo-600">
+                                <label for="ev-pay-required" class="text-xs font-black uppercase tracking-widest text-indigo-300">Require Payment Screenshot?</label>
+                            </div>
                             <button type="submit" class="md:col-span-3 bg-indigo-600 text-white orbitron py-5 rounded-2xl font-black uppercase">Publish Event</button>
                         </form>
                     </div>
@@ -236,7 +244,7 @@
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
                             <thead class="bg-white/5 font-black uppercase text-[10px] text-gray-500">
-                                <tr><th class="px-8 py-5">Student</th><th class="px-8 py-5">Event</th><th class="px-8 py-5">Date</th><th class="px-8 py-5">Action</th></tr>
+                                <tr><th class="px-8 py-5">Student</th><th class="px-8 py-5">Event</th><th class="px-8 py-5">Receipt</th><th class="px-8 py-5">Date</th><th class="px-8 py-5">Action</th></tr>
                             </thead>
                             <tbody id="admin-regs-table" class="divide-y divide-white/5"></tbody>
                         </table>
@@ -330,6 +338,11 @@
                     const d = Math.floor(timeLeft / 864e5), h = Math.floor((timeLeft % 864e5) / 36e5), m = Math.floor((timeLeft % 36e5) / 6e4);
                     countdown = `<span class="text-indigo-400 text-[10px] font-black uppercase">Closes: ${d}d ${h}h ${m}m</span>`;
                 }
+
+                const desc = ev.desc || "No description provided.";
+                const isLong = desc.length > 100;
+                const displayDesc = isLong ? desc.substring(0, 100) + "..." : desc;
+
                 grid.innerHTML += `
                     <div class="glass p-8 rounded-3xl relative overflow-hidden group">
                         <div class="flex justify-between items-start mb-6">
@@ -337,6 +350,13 @@
                             ${countdown}
                         </div>
                         <h3 class="orbitron text-xl font-black text-white mb-4">${ev.title}</h3>
+                        
+                        <!-- Description Section -->
+                        <div class="mb-6">
+                            <p class="text-xs text-gray-300 leading-relaxed" id="desc-text-${ev.id}">${displayDesc}</p>
+                            ${isLong ? `<button onclick="toggleDesc(${ev.id})" id="desc-btn-${ev.id}" class="text-indigo-400 text-[9px] font-black uppercase mt-2 tracking-widest hover:text-white transition">View More</button>` : ''}
+                        </div>
+
                         <div class="space-y-3 text-xs text-gray-400 mb-8">
                             <p><i class="fas fa-calendar-alt w-6 text-indigo-500"></i> ${ev.date} @ ${ev.time}</p>
                             <p><i class="fas fa-map-marker-alt w-6 text-indigo-500"></i> ${ev.location}</p>
@@ -344,6 +364,20 @@
                         <button onclick="registerClick(${ev.id})" ${expired ? 'disabled' : ''} class="w-full py-4 rounded-xl font-black text-[10px] uppercase transition ${expired ? 'bg-white/5 text-white/20' : 'bg-indigo-600 text-white hover:bg-indigo-500'}">${expired ? 'Closed' : 'Register Now'}</button>
                     </div>`;
             });
+        }
+
+        function toggleDesc(id) {
+            const ev = events.find(x => x.id == id);
+            const textEl = document.getElementById(`desc-text-${id}`);
+            const btnEl = document.getElementById(`desc-btn-${id}`);
+            
+            if (btnEl.innerText === "VIEW MORE") {
+                textEl.innerText = ev.desc;
+                btnEl.innerText = "VIEW LESS";
+            } else {
+                textEl.innerText = ev.desc.substring(0, 100) + "...";
+                btnEl.innerText = "VIEW MORE";
+            }
         }
 
         function renderMedia() {
@@ -416,7 +450,8 @@
                 time: document.getElementById('ev-time').value,
                 deadline: document.getElementById('ev-deadline').value,
                 location: document.getElementById('ev-location').value,
-                desc: document.getElementById('ev-desc').value
+                desc: document.getElementById('ev-desc').value,
+                payRequired: document.getElementById('ev-pay-required').checked
             };
             db.ref('events/' + id).set(event);
             e.target.reset();
@@ -447,10 +482,12 @@
             const filtered = registrations.filter(r => r.name.toLowerCase().includes(term) || r.studentId.toLowerCase().includes(term));
             table.innerHTML = "";
             filtered.forEach(r => {
+                const receiptBtn = r.receipt ? `<button onclick="openMediaModal('${r.receipt}', 'image')" class="text-indigo-400 hover:text-white transition uppercase text-[9px] font-black tracking-widest bg-indigo-600/10 px-3 py-1.5 rounded-lg border border-indigo-500/20">View Receipt</button>` : `<span class="text-[9px] text-gray-600 font-black uppercase">N/A</span>`;
                 table.innerHTML += `
                     <tr>
                         <td class="px-8 py-5 text-white font-bold">${r.name}<br><span class="text-[10px] font-mono text-gray-500">${r.studentId}</span></td>
                         <td class="px-8 py-5 text-xs text-indigo-400 font-bold">${r.eventName}</td>
+                        <td class="px-8 py-5">${receiptBtn}</td>
                         <td class="px-8 py-5 text-[10px] text-gray-500 uppercase">${new Date(r.date).toLocaleDateString()}</td>
                         <td class="px-8 py-5"><button onclick="deleteReg(${r.id})" class="text-rose-500/30 hover:text-rose-500"><i class="fas fa-trash"></i></button></td>
                     </tr>`;
@@ -469,9 +506,10 @@
         }
 
         function downloadCSV(data, fileName) {
-            let csv = "Full Name,Student ID,Event,Email,Phone,Date\n";
+            let csv = "Full Name,Student ID,Event,Email,Phone,Receipt Provided,Date\n";
             data.forEach(r => {
-                csv += `"${r.name}","${r.studentId}","${r.eventName}","${r.email}","${r.phone}","${new Date(r.date).toLocaleString().replace(/,/g,'')}"\n`;
+                const hasReceipt = r.receipt ? "Yes" : "No";
+                csv += `"${r.name}","${r.studentId}","${r.eventName}","${r.email}","${r.phone}","${hasReceipt}","${new Date(r.date).toLocaleString().replace(/,/g,'')}"\n`;
             });
             const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
@@ -493,20 +531,39 @@
             }
         }
 
-        document.getElementById('registration-form').addEventListener('submit', e => {
+        document.getElementById('registration-form').addEventListener('submit', async e => {
             e.preventDefault();
             const evId = document.getElementById('reg-event-select').value;
             const ev = events.find(x => x.id == evId);
+            
+            const file = document.getElementById('reg-pay-file').files[0];
+            let receiptUrl = null;
+
+            if (ev.payRequired) {
+                if (!file) {
+                    alert("Please upload payment receipt screenshot.");
+                    return;
+                }
+                const reader = new FileReader();
+                receiptUrl = await new Promise(resolve => {
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(file);
+                });
+            }
+
             const reg = {
                 id: Date.now(), eventId: evId, eventName: ev.title,
                 name: document.getElementById('reg-name').value,
                 studentId: document.getElementById('reg-id').value,
                 email: document.getElementById('reg-email').value,
                 phone: document.getElementById('reg-phone').value,
-                date: new Date().toISOString()
+                date: new Date().toISOString(),
+                receipt: receiptUrl
             };
             db.ref('registrations/' + reg.id).set(reg);
-            alert("Registration Successful!"); e.target.reset(); showView('home-view');
+            alert("Registration Successful!"); e.target.reset(); 
+            document.getElementById('reg-pay-section').classList.add('hidden');
+            showView('home-view');
         });
 
         function populateRegDropdown() {
@@ -515,7 +572,22 @@
             events.forEach(ev => s.innerHTML += `<option value="${ev.id}">${ev.title}</option>`);
         }
 
-        function registerClick(id) { showView('register-view'); document.getElementById('reg-event-select').value = id; }
+        document.getElementById('reg-event-select').addEventListener('change', e => {
+            const evId = e.target.value;
+            const ev = events.find(x => x.id == evId);
+            const paySection = document.getElementById('reg-pay-section');
+            if (ev && ev.payRequired) {
+                paySection.classList.remove('hidden');
+            } else {
+                paySection.classList.add('hidden');
+            }
+        });
+
+        function registerClick(id) { 
+            showView('register-view'); 
+            document.getElementById('reg-event-select').value = id; 
+            document.getElementById('reg-event-select').dispatchEvent(new Event('change'));
+        }
         function deleteEvent(id) { if(confirm("Delete Event?")) { db.ref('events/'+id).remove(); db.ref('registrations').once('value', snap => { const rs = snap.val()||{}; for(let k in rs) if(rs[k].eventId == id) db.ref('registrations/'+k).remove(); }); } }
         function deleteReg(id) { if(confirm("Delete Student?")) db.ref('registrations/'+id).remove(); }
         function loginAdmin() { if(document.getElementById('admin-pass').value === adminPass) { document.getElementById('admin-login-box').classList.add('hidden'); document.getElementById('admin-dashboard').classList.remove('hidden'); } else document.getElementById('login-error').classList.remove('hidden'); }
