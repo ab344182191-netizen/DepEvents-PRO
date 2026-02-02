@@ -281,9 +281,21 @@
         let events = [], registrations = [], media = [], adminPass = "admin123", notifText = "", notifShow = true, galleryShow = true;
 
         function initData() {
-            db.ref('events').on('value', snap => { events = snap.val() ? Object.values(snap.val()) : []; refreshAll(); });
-            db.ref('registrations').on('value', snap => { registrations = snap.val() ? Object.values(snap.val()) : []; renderAdminRegs(); });
-            db.ref('media').on('value', snap => { media = snap.val() ? Object.values(snap.val()) : []; renderMedia(); });
+            db.ref('events').on('value', snap => {
+                const data = snap.val() || {};
+                events = Object.keys(data).map(key => ({ ...data[key], firebaseKey: key }));
+                refreshAll();
+            });
+            db.ref('registrations').on('value', snap => {
+                const data = snap.val() || {};
+                registrations = Object.keys(data).map(key => ({ ...data[key], firebaseKey: key }));
+                renderAdminRegs();
+            });
+            db.ref('media').on('value', snap => {
+                const data = snap.val() || {};
+                media = Object.keys(data).map(key => ({ ...data[key], firebaseKey: key }));
+                renderMedia();
+            });
             db.ref('settings').on('value', snap => {
                 const s = snap.val() || {};
                 adminPass = s.pass || "admin123";
@@ -462,15 +474,18 @@
             const table = document.getElementById('admin-events-table');
             table.innerHTML = "";
             events.forEach(ev => {
-                const count = registrations.filter(r => r.eventId == ev.id).length;
+                const count = registrations.filter(r => String(r.eventId) === String(ev.id)).length;
                 table.innerHTML += `
                     <tr>
                         <td class="px-8 py-5 text-white font-bold">${ev.title}<br><span class="text-[9px] text-gray-500 font-normal uppercase">${ev.category}</span></td>
                         <td class="px-8 py-5 text-xs">${ev.location}</td>
                         <td class="px-8 py-5"><span class="bg-indigo-600/20 px-2 py-1 rounded text-indigo-400 font-bold">${count}</span></td>
                         <td class="px-8 py-5">
-                            <button onclick="exportSpecific(${ev.id}, '${ev.title}')" class="text-emerald-500 mr-4"><i class="fas fa-file-excel"></i></button>
-                            <button onclick="deleteEvent(${ev.id})" class="text-rose-500"><i class="fas fa-trash"></i></button>
+                            <div class="flex items-center space-x-4">
+                                <button onclick="exportSpecific('${ev.id}', '${ev.title}')" class="text-emerald-500" title="Export CSV"><i class="fas fa-file-excel"></i></button>
+                                <button onclick="extendDeadline('${ev.firebaseKey}', '${ev.deadline}')" class="text-indigo-400" title="Extend Deadline"><i class="fas fa-clock"></i></button>
+                                <button onclick="deleteEvent('${ev.firebaseKey}', '${ev.id}')" class="text-rose-500" title="Delete Event"><i class="fas fa-trash"></i></button>
+                            </div>
                         </td>
                     </tr>`;
             });
@@ -479,7 +494,7 @@
         function renderAdminRegs() {
             const table = document.getElementById('admin-regs-table');
             const term = document.getElementById('admin-reg-search').value.toLowerCase();
-            const filtered = registrations.filter(r => r.name.toLowerCase().includes(term) || r.studentId.toLowerCase().includes(term));
+            const filtered = registrations.filter(r => r.name.toLowerCase().includes(term) || r.studentId.toLowerCase().includes(term) || r.eventName.toLowerCase().includes(term));
             table.innerHTML = "";
             filtered.forEach(r => {
                 const receiptBtn = r.receipt ? `<button onclick="openMediaModal('${r.receipt}', 'image')" class="text-indigo-400 hover:text-white transition uppercase text-[9px] font-black tracking-widest bg-indigo-600/10 px-3 py-1.5 rounded-lg border border-indigo-500/20">View Receipt</button>` : `<span class="text-[9px] text-gray-600 font-black uppercase">N/A</span>`;
@@ -489,13 +504,13 @@
                         <td class="px-8 py-5 text-xs text-indigo-400 font-bold">${r.eventName}</td>
                         <td class="px-8 py-5">${receiptBtn}</td>
                         <td class="px-8 py-5 text-[10px] text-gray-500 uppercase">${new Date(r.date).toLocaleDateString()}</td>
-                        <td class="px-8 py-5"><button onclick="deleteReg(${r.id})" class="text-rose-500/30 hover:text-rose-500"><i class="fas fa-trash"></i></button></td>
+                        <td class="px-8 py-5"><button onclick="deleteReg('${r.firebaseKey}')" class="text-rose-500/30 hover:text-rose-500"><i class="fas fa-trash"></i></button></td>
                     </tr>`;
             });
         }
 
         function exportSpecific(id, title) {
-            const list = registrations.filter(r => r.eventId == id);
+            const list = registrations.filter(r => String(r.eventId) === String(id));
             if (!list.length) return alert("No registrations for this event.");
             downloadCSV(list, `Participants_${title.replace(/\s+/g, '_')}.csv`);
         }
@@ -588,8 +603,27 @@
             document.getElementById('reg-event-select').value = id; 
             document.getElementById('reg-event-select').dispatchEvent(new Event('change'));
         }
-        function deleteEvent(id) { if(confirm("Delete Event?")) { db.ref('events/'+id).remove(); db.ref('registrations').once('value', snap => { const rs = snap.val()||{}; for(let k in rs) if(rs[k].eventId == id) db.ref('registrations/'+k).remove(); }); } }
-        function deleteReg(id) { if(confirm("Delete Student?")) db.ref('registrations/'+id).remove(); }
+        function extendDeadline(fKey, oldDeadline) {
+            const newDeadline = prompt("Update Registration Deadline (YYYY-MM-DDTHH:MM):", oldDeadline || "2026-12-31T23:59");
+            if (newDeadline) {
+                db.ref('events/' + fKey).update({ deadline: newDeadline })
+                    .then(() => alert("Deadline Extended Successfully!"))
+                    .catch(err => alert("Error: " + err.message));
+            }
+        }
+        function deleteEvent(fKey, evId) { 
+            if(confirm("Are you sure you want to delete this event and all its registrations?")) { 
+                db.ref('events/' + fKey).remove().then(() => {
+                    registrations.forEach(r => {
+                        if (String(r.eventId) === String(evId)) {
+                            db.ref('registrations/' + r.firebaseKey).remove();
+                        }
+                    });
+                    alert("Event and associated records deleted.");
+                });
+            } 
+        }
+        function deleteReg(fKey) { if(confirm("Delete Student registration?")) db.ref('registrations/' + fKey).remove(); }
         function loginAdmin() { if(document.getElementById('admin-pass').value === adminPass) { document.getElementById('admin-login-box').classList.add('hidden'); document.getElementById('admin-dashboard').classList.remove('hidden'); } else document.getElementById('login-error').classList.remove('hidden'); }
         function logoutAdmin() { document.getElementById('admin-login-box').classList.remove('hidden'); document.getElementById('admin-dashboard').classList.add('hidden'); }
         function changeAdminPassword() { const p = document.getElementById('new-admin-pass').value; if(p.length<5) return; db.ref('settings/pass').set(p); alert("Password Updated!"); }
