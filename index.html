@@ -3,99 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeptEvents Pro - Online Registration System</title>
+    <title>DeptEvents Pro - University Event Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap');
-
-        :root {
-            --primary: #6366f1;
-            --accent: #f43f5e;
-            --bg-dark: #020617;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-dark);
-            color: #e2e8f0;
-            overflow-x: hidden;
-        }
-
+        :root { --primary: #6366f1; --bg-dark: #020617; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: #e2e8f0; overflow-x: hidden; }
         .orbitron { font-family: 'Orbitron', sans-serif; }
-
-        /* Professional Galaxy Background */
-        .stars-container {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            background: radial-gradient(circle at top right, #1e1b4b 0%, #020617 100%);
-            overflow: hidden;
-        }
-
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            opacity: 0.5;
-            animation: twinkle var(--duration) infinite ease-in-out;
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.2); }
-        }
-
-        /* Marquee Animation */
-        .marquee {
-            white-space: nowrap;
-            overflow: hidden;
-            display: inline-block;
-            animation: marquee 25s linear infinite;
-        }
-
-        @keyframes marquee {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
-
-        /* Glassmorphism */
-        .glass {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
+        .stars-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at top right, #1e1b4b 0%, #020617 100%); overflow: hidden; }
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.5; animation: twinkle var(--duration) infinite ease-in-out; }
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.2); } }
+        .marquee { white-space: nowrap; overflow: hidden; display: inline-block; animation: marquee 25s linear infinite; }
+        @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .view-section { display: none; opacity: 0; transform: translateY(20px); transition: all 0.5s ease-out; }
         .view-section.active { display: block; opacity: 1; transform: translateY(0); }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #020617; }
-        ::-webkit-scrollbar-thumb { background: #312e81; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #4338ca; }
-
-        /* Mobile Nav */
-        #mobile-menu {
-            transition: all 0.3s ease-in-out;
-            max-height: 0;
-            overflow: hidden;
-        }
+        #mobile-menu { transition: all 0.3s ease-in-out; max-height: 0; overflow: hidden; }
         #mobile-menu.open { max-height: 500px; padding: 1rem 0; }
+        .media-card:hover .overlay { opacity: 1; }
     </style>
 </head>
 <body>
     <div class="stars-container" id="stars"></div>
 
-    <!-- Top Notification Bar -->
+    <!-- Notification Bar -->
     <div id="notif-bar" class="bg-indigo-600/20 backdrop-blur-md border-b border-indigo-500/30 py-2 hidden">
         <div class="container mx-auto px-4 overflow-hidden">
-            <div id="notif-text" class="marquee text-[10px] font-black uppercase tracking-[0.2em] text-indigo-300">
-                📢 Welcome to DeptEvents Pro | Register now for upcoming workshops | Stay tuned for new updates!
-            </div>
+            <div id="notif-text" class="marquee text-[10px] font-black uppercase tracking-[0.2em] text-indigo-300"></div>
         </div>
     </div>
 
@@ -108,49 +45,47 @@
                         <i class="fas fa-graduation-cap text-white text-xl"></i>
                     </div>
                     <div>
-                        <h1 class="orbitron text-xl font-black tracking-tighter uppercase leading-none">
-                            Dept<span class="text-indigo-500">Events</span>
-                        </h1>
-                        <span class="text-[10px] text-indigo-400 font-bold tracking-widest uppercase">Pro Edition</span>
+                        <h1 class="orbitron text-xl font-black tracking-tighter uppercase leading-none">Dept<span class="text-indigo-500">Events</span></h1>
+                        <span class="text-[10px] text-indigo-400 font-bold tracking-widest uppercase">Pro Edition 2026</span>
                     </div>
                 </div>
-                
                 <nav class="hidden lg:block">
                     <ul class="flex space-x-8 text-[11px] font-black uppercase tracking-widest items-center">
-                        <li><a href="javascript:void(0)" onclick="showView('home-view')" class="hover:text-indigo-400 transition-colors">Events</a></li>
-                        <li><a href="javascript:void(0)" onclick="showView('register-view')" class="hover:text-indigo-400 transition-colors">Register</a></li>
-                        <li><a href="javascript:void(0)" onclick="showView('status-view')" class="hover:text-indigo-400 transition-colors">My Status</a></li>
-                        <li><a href="javascript:void(0)" onclick="showView('admin-view')" class="bg-white/10 px-5 py-2.5 rounded-full hover:bg-indigo-600 transition-all border border-white/10">Admin Panel</a></li>
+                        <li><a href="javascript:void(0)" onclick="showView('home-view')" class="hover:text-indigo-400 transition">Events</a></li>
+                        <li><a href="javascript:void(0)" onclick="showView('register-view')" class="hover:text-indigo-400 transition">Register</a></li>
+                        <li><a href="javascript:void(0)" onclick="showView('status-view')" class="hover:text-indigo-400 transition">My Status</a></li>
+                        <li><a href="javascript:void(0)" onclick="showView('admin-view')" class="bg-white/10 px-5 py-2.5 rounded-full hover:bg-indigo-600 transition border border-white/10">Admin Panel</a></li>
                     </ul>
                 </nav>
-
-                <button onclick="toggleMobileMenu()" class="lg:hidden text-2xl focus:outline-none p-2">
-                    <i id="menu-icon" class="fas fa-bars"></i>
-                </button>
+                <button onclick="toggleMobileMenu()" class="lg:hidden text-2xl p-2"><i id="menu-icon" class="fas fa-bars"></i></button>
             </div>
-
             <div id="mobile-menu" class="lg:hidden">
                 <ul class="flex flex-col space-y-4 font-black uppercase text-sm border-t border-white/5 pt-4 pb-4">
-                    <li><a href="javascript:void(0)" onclick="showView('home-view'); toggleMobileMenu()" class="block py-2 text-indigo-100">Events</a></li>
-                    <li><a href="javascript:void(0)" onclick="showView('register-view'); toggleMobileMenu()" class="block py-2 text-indigo-100">Register</a></li>
-                    <li><a href="javascript:void(0)" onclick="showView('status-view'); toggleMobileMenu()" class="block py-2 text-indigo-100">My Status</a></li>
-                    <li><a href="javascript:void(0)" onclick="showView('admin-view'); toggleMobileMenu()" class="block py-2 text-indigo-400">Admin Panel</a></li>
+                    <li><a href="javascript:void(0)" onclick="showView('home-view'); toggleMobileMenu()">Events</a></li>
+                    <li><a href="javascript:void(0)" onclick="showView('register-view'); toggleMobileMenu()">Register</a></li>
+                    <li><a href="javascript:void(0)" onclick="showView('status-view'); toggleMobileMenu()">My Status</a></li>
+                    <li><a href="javascript:void(0)" onclick="showView('admin-view'); toggleMobileMenu()" class="text-indigo-400">Admin Panel</a></li>
                 </ul>
             </div>
         </div>
     </header>
 
-    <main class="flex-grow container mx-auto px-4 py-8 md:py-16">
-        
+    <main class="container mx-auto px-4 py-12">
         <!-- HOME VIEW -->
         <section id="home-view" class="view-section active">
             <div class="max-w-4xl mx-auto text-center mb-16">
                 <span class="bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.3em] mb-6 inline-block">University Events Portal</span>
-                <h2 class="orbitron text-4xl md:text-6xl font-black text-white mb-6 tracking-tighter leading-tight">Upcoming <span class="text-indigo-500">Events</span></h2>
-                <p class="text-gray-400 text-sm md:text-lg max-w-xl mx-auto font-medium">Explore and register for seminars, workshops, and competitions hosted by the department.</p>
+                <h2 class="orbitron text-4xl md:text-6xl font-black text-white mb-6">Upcoming <span class="text-indigo-500">Events</span></h2>
             </div>
-            <div id="events-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Events loaded dynamically -->
+            <div id="events-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20"></div>
+
+            <!-- MEDIA GALLERY SECTION -->
+            <div id="home-gallery-section" class="hidden">
+                <div class="max-w-4xl mx-auto text-center mb-12">
+                    <h3 class="orbitron text-2xl font-black text-white uppercase tracking-widest">Event <span class="text-indigo-500">Highlights</span></h3>
+                    <div class="w-24 h-1 bg-indigo-600 mx-auto mt-4 rounded-full"></div>
+                </div>
+                <div id="home-media-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
             </div>
         </section>
 
@@ -158,53 +93,31 @@
         <section id="register-view" class="view-section">
             <div class="max-w-3xl mx-auto glass rounded-3xl overflow-hidden">
                 <div class="bg-indigo-600/20 py-8 px-8 border-b border-white/10">
-                    <h2 class="orbitron text-2xl md:text-3xl font-bold text-white mb-2">Student Registration</h2>
-                    <p class="text-indigo-300 text-sm font-medium">Complete the form below to register for your selected event.</p>
+                    <h2 class="orbitron text-2xl font-bold text-white">Student Registration</h2>
                 </div>
-                <form id="registration-form" class="p-8 md:p-12 space-y-8">
+                <form id="registration-form" class="p-8 space-y-8">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="md:col-span-2">
-                            <label class="block text-[10px] font-black uppercase text-indigo-400 tracking-widest mb-3 ml-1">Select Event</label>
-                            <select id="reg-event-select" required class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none text-white transition">
-                                <option value="" class="bg-slate-900">-- Select Event --</option>
-                            </select>
+                            <label class="block text-[10px] font-black uppercase text-indigo-400 tracking-widest mb-3">Select Event</label>
+                            <select id="reg-event-select" required class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none"></select>
                         </div>
-                        <div>
-                            <label class="block text-[10px] font-black uppercase text-indigo-400 tracking-widest mb-3 ml-1">Full Name</label>
-                            <input type="text" id="reg-name" required placeholder="Full Name" class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none text-white transition">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black uppercase text-indigo-400 tracking-widest mb-3 ml-1">Student ID</label>
-                            <input type="text" id="reg-id" required placeholder="FA21-BCS-000" class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none text-white transition">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black uppercase text-indigo-400 tracking-widest mb-3 ml-1">Email Address</label>
-                            <input type="email" id="reg-email" required placeholder="name@domain.com" class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none text-white transition">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black uppercase text-indigo-400 tracking-widest mb-3 ml-1">Phone Number</label>
-                            <input type="tel" id="reg-phone" required placeholder="03XX-XXXXXXX" class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none text-white transition">
-                        </div>
+                        <input type="text" id="reg-name" required placeholder="Full Name" class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none">
+                        <input type="text" id="reg-id" required placeholder="Student ID (FA21-BCS-000)" class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none">
+                        <input type="email" id="reg-email" required placeholder="Email Address" class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none">
+                        <input type="tel" id="reg-phone" required placeholder="Phone Number" class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none">
                     </div>
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white orbitron font-bold py-5 rounded-2xl shadow-[0_0_20px_rgba(79,70,229,0.4)] transition-all active:scale-95 uppercase tracking-widest">
-                        Submit Registration
-                    </button>
+                    <button type="submit" class="w-full bg-indigo-600 text-white orbitron font-bold py-5 rounded-2xl uppercase tracking-widest hover:bg-indigo-500 transition">Submit Registration</button>
                 </form>
             </div>
         </section>
 
         <!-- STATUS VIEW -->
         <section id="status-view" class="view-section">
-            <div class="max-w-2xl mx-auto glass p-8 md:p-12 rounded-3xl text-center">
-                <div class="w-20 h-20 bg-indigo-600/20 text-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-8 border border-indigo-500/30">
-                    <i class="fas fa-search text-3xl"></i>
-                </div>
-                <h2 class="orbitron text-2xl md:text-3xl font-black text-white mb-2 uppercase">Registration Status</h2>
-                <p class="text-gray-400 text-sm mb-10">Enter your Student ID to verify your registered events.</p>
-                
+            <div class="max-w-2xl mx-auto glass p-12 rounded-3xl text-center">
+                <h2 class="orbitron text-2xl font-black text-white mb-8 uppercase">Check Your Status</h2>
                 <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-10">
-                    <input type="text" id="search-student-id" placeholder="FA21-BCS-000" class="flex-grow px-6 py-5 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none text-white font-mono text-center">
-                    <button onclick="checkStudentStatus()" class="bg-indigo-600 text-white px-10 py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-indigo-500 transition-all active:scale-95">Search</button>
+                    <input type="text" id="search-student-id" placeholder="Enter Student ID" class="flex-grow px-6 py-5 bg-white/5 border border-white/10 rounded-2xl text-white outline-none text-center">
+                    <button onclick="checkStudentStatus()" class="bg-indigo-600 text-white px-10 py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-indigo-500">Search</button>
                 </div>
                 <div id="status-results" class="space-y-4 text-left"></div>
             </div>
@@ -212,150 +125,118 @@
 
         <!-- ADMIN VIEW -->
         <section id="admin-view" class="view-section">
-            <div id="admin-login-box" class="max-w-md mx-auto glass p-10 rounded-3xl mt-12 text-center">
-                <i class="fas fa-shield-alt text-5xl text-indigo-500 mb-6"></i>
-                <h2 class="orbitron text-2xl font-bold mb-8 text-white uppercase tracking-widest">Admin Access</h2>
-                <div class="space-y-6">
-                    <input type="password" id="admin-pass" placeholder="Authorization Key" class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 text-white text-center">
-                    <button onclick="loginAdmin()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-4 rounded-2xl font-black uppercase tracking-widest transition shadow-lg">Authenticate</button>
-                    <p id="login-error" class="text-rose-500 text-[10px] font-black uppercase tracking-widest hidden">Access Denied: Invalid Key</p>
-                </div>
+            <!-- LOGIN -->
+            <div id="admin-login-box" class="max-w-md mx-auto glass p-10 rounded-3xl text-center">
+                <h2 class="orbitron text-2xl font-bold mb-8 text-white uppercase">Admin Access</h2>
+                <input type="password" id="admin-pass" placeholder="Authorization Key" class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl outline-none text-white text-center mb-6">
+                <button onclick="loginAdmin()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-indigo-500">Authenticate</button>
+                <p id="login-error" class="text-rose-500 text-[10px] mt-4 hidden">ACCESS DENIED: INVALID KEY</p>
             </div>
 
-            <!-- ADMIN DASHBOARD -->
+            <!-- DASHBOARD -->
             <div id="admin-dashboard" class="hidden space-y-12">
                 <div class="flex flex-col md:flex-row justify-between items-center gap-6 border-b border-white/10 pb-8">
-                    <div>
-                        <h2 class="orbitron text-3xl font-black text-white tracking-tighter uppercase">Admin <span class="text-indigo-500">Dashboard</span></h2>
-                        <p class="text-gray-500 font-bold text-[10px] uppercase tracking-widest">Event & Participant Management System</p>
-                    </div>
-                    <div class="flex space-x-3 w-full md:w-auto">
-                        <button onclick="showAdminTab('events')" class="bg-indigo-600 text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest">Manage Events</button>
-                        <button onclick="showAdminTab('settings')" class="bg-slate-800 text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest">Settings</button>
-                        <button onclick="logoutAdmin()" class="bg-rose-500/20 text-rose-500 border border-rose-500/30 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest">Logout</button>
+                    <h2 class="orbitron text-3xl font-black text-white uppercase">Admin <span class="text-indigo-500">Dashboard</span></h2>
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="showAdminTab('events')" class="bg-indigo-600 text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase">Events</button>
+                        <button onclick="showAdminTab('media')" class="bg-indigo-600 text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase">Manage Gallery</button>
+                        <button onclick="showAdminTab('settings')" class="bg-slate-800 text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase">Settings</button>
+                        <button onclick="logoutAdmin()" class="bg-rose-500/20 text-rose-500 px-6 py-3 rounded-xl text-[10px] font-black uppercase">Logout</button>
                     </div>
                 </div>
 
-                <!-- Admin Tab: Events & Notif -->
+                <!-- EVENTS TAB -->
                 <div id="admin-tab-events" class="space-y-10">
-                    <!-- Create Event Form -->
                     <div class="glass p-8 rounded-3xl">
-                        <h3 class="orbitron text-xl font-black mb-8 text-indigo-400 uppercase tracking-widest border-l-4 border-indigo-600 pl-4">Create New Event</h3>
+                        <h3 class="orbitron text-xl font-black mb-8 text-indigo-400 uppercase">Create Event</h3>
                         <form id="add-event-form" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="md:col-span-2">
-                                <label class="block text-[10px] font-black text-indigo-300 uppercase mb-2 tracking-widest">Event Title</label>
-                                <input type="text" id="ev-title" placeholder="e.g. Workshop on AI" required class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-black text-indigo-300 uppercase mb-2 tracking-widest">Category</label>
-                                <select id="ev-category" required class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:ring-2 focus:ring-indigo-500">
-                                    <option value="" class="bg-slate-900">Select...</option>
-                                    <option value="Workshop" class="bg-slate-900">Workshop</option>
-                                    <option value="Seminar" class="bg-slate-900">Seminar</option>
-                                    <option value="Competition" class="bg-slate-900">Competition</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-black text-indigo-300 uppercase mb-2 tracking-widest">Event Date</label>
-                                <input type="date" id="ev-date" required class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-black text-indigo-300 uppercase mb-2 tracking-widest">Event Time</label>
-                                <input type="time" id="ev-time" required class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-black text-rose-400 uppercase mb-2 tracking-widest">Reg. Deadline</label>
-                                <input type="datetime-local" id="ev-deadline" required class="w-full px-5 py-4 bg-rose-500/5 border border-rose-500/20 rounded-2xl text-white outline-none">
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-[10px] font-black text-indigo-300 uppercase mb-2 tracking-widest">Event Description</label>
-                                <textarea id="ev-desc" placeholder="Details about the event..." required class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white h-24 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-                            </div>
-                            <div class="md:col-span-1">
-                                <label class="block text-[10px] font-black text-indigo-300 uppercase mb-2 tracking-widest">Event Location</label>
-                                <input type="text" id="ev-location" placeholder="e.g. Main Auditorium" required class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
-                            <button type="submit" class="md:col-span-3 bg-indigo-600 text-white orbitron py-5 rounded-2xl font-black uppercase tracking-[0.3em] hover:bg-indigo-500 shadow-xl active:scale-95 transition">Publish Event</button>
+                            <input type="text" id="ev-title" placeholder="Event Title" required class="md:col-span-2 px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none">
+                            <select id="ev-category" required class="px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none">
+                                <option value="" class="bg-slate-900">Category...</option>
+                                <option value="Workshop" class="bg-slate-900">Workshop</option>
+                                <option value="Seminar" class="bg-slate-900">Seminar</option>
+                                <option value="Competition" class="bg-slate-900">Competition</option>
+                            </select>
+                            <input type="date" id="ev-date" required class="px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white">
+                            <input type="time" id="ev-time" required class="px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white">
+                            <input type="datetime-local" id="ev-deadline" required class="px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white">
+                            <input type="text" id="ev-location" placeholder="Location (Hall A, Lab 1 etc.)" required class="md:col-span-3 px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none">
+                            <textarea id="ev-desc" placeholder="Event Description..." required class="md:col-span-3 px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white h-24 outline-none"></textarea>
+                            <button type="submit" class="md:col-span-3 bg-indigo-600 text-white orbitron py-5 rounded-2xl font-black uppercase">Publish Event</button>
                         </form>
                     </div>
-
-                    <!-- Database Connection Info -->
-                    <div class="glass p-8 rounded-3xl border border-emerald-500/20">
-                        <div class="flex items-center space-x-4 mb-4">
-                            <i class="fas fa-check-circle text-emerald-500 text-2xl"></i>
-                            <h3 class="orbitron text-xl font-black text-white uppercase tracking-widest">Cloud Database Connected</h3>
-                        </div>
-                        <p class="text-xs text-emerald-400/80 leading-relaxed font-bold uppercase tracking-widest">System Status: Synchronizing across all devices globally in real-time.</p>
-                    </div>
-
-                    <!-- Event Management Table -->
-                    <div class="glass rounded-3xl overflow-hidden border border-white/10">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left">
-                                <thead class="bg-white/5">
-                                    <tr class="text-[10px] uppercase text-indigo-400 font-black tracking-widest border-b border-white/10">
-                                        <th class="px-8 py-5">Event Detail</th>
-                                        <th class="px-8 py-5 text-center">Registrations</th>
-                                        <th class="px-8 py-5">Status</th>
-                                        <th class="px-8 py-5">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="admin-events-table" class="divide-y divide-white/5"></tbody>
-                            </table>
-                        </div>
+                    <div class="glass rounded-3xl overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-white/5 font-black uppercase text-indigo-400 text-[10px]">
+                                <tr><th class="px-8 py-5">Event</th><th class="px-8 py-5">Location</th><th class="px-8 py-5">Regs</th><th class="px-8 py-5">Action</th></tr>
+                            </thead>
+                            <tbody id="admin-events-table" class="divide-y divide-white/5"></tbody>
+                        </table>
                     </div>
                 </div>
 
-                <!-- Admin Tab: Settings -->
+                <!-- MEDIA TAB -->
+                <div id="admin-tab-media" class="hidden space-y-10">
+                    <div class="glass p-8 rounded-3xl">
+                        <div class="flex justify-between items-center mb-8">
+                            <h3 class="orbitron text-xl font-black text-indigo-400 uppercase">Manage Media Gallery</h3>
+                            <button onclick="toggleGalleryVisibility()" id="gallery-toggle-btn" class="px-6 py-2 rounded-xl text-[10px] font-black uppercase border"></button>
+                        </div>
+                        <form id="upload-media-form" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <input type="text" id="media-title" placeholder="Media Title" required class="md:col-span-2 px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none">
+                            <select id="media-type" required class="px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none">
+                                <option value="image" class="bg-slate-900">Image</option>
+                                <option value="video" class="bg-slate-900">Video</option>
+                            </select>
+                            <div class="md:col-span-3">
+                                <label class="block text-[10px] font-black text-indigo-300 uppercase mb-2">Select File from Computer</label>
+                                <input type="file" id="media-file" accept="image/*,video/*" required class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none">
+                            </div>
+                            <button type="submit" class="md:col-span-3 bg-indigo-600 text-white orbitron py-5 rounded-2xl font-black uppercase">Upload to Cloud</button>
+                        </form>
+                    </div>
+                    <div class="glass rounded-3xl overflow-hidden">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-white/5 font-black uppercase text-indigo-400 text-[10px]">
+                                <tr><th class="px-8 py-5">Media</th><th class="px-8 py-5">Type</th><th class="px-8 py-5">Action</th></tr>
+                            </thead>
+                            <tbody id="admin-media-table" class="divide-y divide-white/5"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- SETTINGS TAB -->
                 <div id="admin-tab-settings" class="hidden space-y-10">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                        <!-- Password Management -->
                         <div class="glass p-8 rounded-3xl">
-                            <h3 class="orbitron text-xl font-black mb-6 text-indigo-400 uppercase tracking-widest">Admin Credentials</h3>
-                            <div class="space-y-6">
-                                <div>
-                                    <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">New Password</label>
-                                    <input type="password" id="new-admin-pass" class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:ring-2 focus:ring-indigo-500">
-                                </div>
-                                <button onclick="changeAdminPassword()" class="w-full bg-slate-800 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-slate-700 transition">Update Password</button>
-                            </div>
+                            <h3 class="orbitron text-xl font-black mb-6 text-indigo-400 uppercase">Change Admin Password</h3>
+                            <input type="password" id="new-admin-pass" placeholder="New Password" class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none mb-4">
+                            <button onclick="changeAdminPassword()" class="w-full bg-slate-800 text-white py-4 rounded-2xl font-black uppercase">Update Password</button>
                         </div>
-
-                        <!-- Notification Control -->
                         <div class="glass p-8 rounded-3xl">
-                            <h3 class="orbitron text-xl font-black mb-6 text-indigo-400 uppercase tracking-widest">UI Notification</h3>
-                            <div class="space-y-6">
-                                <div>
-                                    <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Marquee Text</label>
-                                    <input type="text" id="notif-input" class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:ring-2 focus:ring-indigo-500">
-                                </div>
-                                <div class="flex items-center space-x-4">
-                                    <button onclick="updateNotif()" class="flex-grow bg-indigo-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest transition hover:bg-indigo-500">Update Bar</button>
-                                    <button onclick="toggleNotifVis()" id="notif-toggle-btn" class="bg-rose-500/20 text-rose-500 px-6 py-4 rounded-2xl font-black uppercase tracking-widest border border-rose-500/30">Hide Bar</button>
-                                </div>
+                            <h3 class="orbitron text-xl font-black mb-6 text-indigo-400 uppercase">Notification Bar</h3>
+                            <input type="text" id="notif-input" placeholder="Marquee Text" class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none mb-4">
+                            <div class="flex space-x-3">
+                                <button onclick="updateNotif()" class="flex-grow bg-indigo-600 text-white py-4 rounded-2xl font-black uppercase">Update Text</button>
+                                <button onclick="toggleNotifVis()" id="notif-toggle-btn" class="px-6 py-4 rounded-2xl font-black uppercase border border-rose-500/30"></button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Participant Records -->
+                <!-- REGISTRATIONS TABLE -->
                 <div class="glass rounded-3xl overflow-hidden">
                     <div class="bg-white/5 px-8 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
-                        <span class="orbitron font-black text-white uppercase tracking-widest">Student Records</span>
+                        <span class="orbitron font-black text-white uppercase">Student Records</span>
                         <div class="flex space-x-3 w-full md:w-auto">
-                            <input type="text" id="admin-reg-search" oninput="renderAdminRegs()" placeholder="Search Student ID..." class="px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500 flex-grow text-white">
-                            <button onclick="exportCSV()" class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest">Export CSV</button>
+                            <input type="text" id="admin-reg-search" oninput="renderAdminRegs()" placeholder="Search Name/ID..." class="px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-xs text-white outline-none flex-grow">
+                            <button onclick="exportCSV()" class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 px-6 py-3 rounded-xl text-[10px] font-black uppercase">Export CSV</button>
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="bg-white/5">
-                                <tr class="text-[10px] uppercase text-gray-500 font-black tracking-widest border-b border-white/10">
-                                    <th class="px-8 py-5">Student</th>
-                                    <th class="px-8 py-5">Event</th>
-                                    <th class="px-8 py-5">Date</th>
-                                    <th class="px-8 py-5">Action</th>
-                                </tr>
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-white/5 font-black uppercase text-[10px] text-gray-500">
+                                <tr><th class="px-8 py-5">Student</th><th class="px-8 py-5">Event</th><th class="px-8 py-5">Date</th><th class="px-8 py-5">Action</th></tr>
                             </thead>
                             <tbody id="admin-regs-table" class="divide-y divide-white/5"></tbody>
                         </table>
@@ -366,42 +247,17 @@
     </main>
 
     <footer class="border-t border-white/5 py-12 text-center">
-        <div class="container mx-auto px-4">
-            <h2 class="orbitron text-xl font-black text-white/40 tracking-[0.5em] uppercase mb-6">DeptEvents Pro</h2>
-            <div class="flex justify-center space-x-8 mb-8">
-                <i class="fab fa-linkedin text-xl text-indigo-400 hover:text-white cursor-pointer transition"></i>
-                <i class="fab fa-github text-xl text-indigo-400 hover:text-white cursor-pointer transition"></i>
-                <i class="fab fa-facebook text-xl text-indigo-400 hover:text-white cursor-pointer transition"></i>
-            </div>
-            <p class="text-[10px] text-indigo-400/50 font-black uppercase tracking-widest">
-                &copy; 2026 DeptEvents Pro - Advanced Multi-Page Event Management System
-            </p>
-        </div>
+        <h2 class="orbitron text-xl font-black text-white/40 tracking-[0.5em] mb-4">DeptEvents Pro</h2>
+        <p class="text-[10px] text-indigo-400/50 font-black uppercase tracking-widest">&copy; 2026 University Event Portal - All Rights Reserved</p>
     </footer>
 
-    <!-- MODALS -->
-    <div id="edit-deadline-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-lg hidden z-[100] flex items-center justify-center p-4">
-        <div class="glass rounded-3xl p-10 max-w-sm w-full shadow-2xl">
-            <h3 class="orbitron text-xl font-bold mb-6 text-white text-center">Update Deadline</h3>
-            <input type="hidden" id="edit-event-id">
-            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1">New Registration Deadline</label>
-            <input type="datetime-local" id="edit-new-deadline" class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white mb-8 outline-none">
-            <div class="flex space-x-4">
-                <button onclick="saveNewDeadline()" class="flex-grow bg-indigo-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest">Update</button>
-                <button onclick="closeDeadlineModal()" class="flex-grow bg-slate-800 text-white py-4 rounded-2xl font-black uppercase tracking-widest">Cancel</button>
-            </div>
-        </div>
+    <!-- Video Modal -->
+    <div id="video-modal" class="fixed inset-0 bg-black/95 backdrop-blur-xl hidden z-[100] flex items-center justify-center p-4">
+        <button onclick="closeVideoModal()" class="absolute top-10 right-10 text-white text-4xl hover:text-indigo-400 transition"><i class="fas fa-times"></i></button>
+        <div id="video-container" class="w-full max-w-5xl aspect-video rounded-3xl overflow-hidden shadow-2xl bg-black"></div>
     </div>
 
     <script>
-        // Database Initialization
-        let events = JSON.parse(localStorage.getItem('sys_events')) || [];
-        let registrations = JSON.parse(localStorage.getItem('sys_regs')) || [];
-        let adminPass = localStorage.getItem('sys_admin_pass') || 'admin123';
-        let notifText = localStorage.getItem('sys_notif_text') || '📣 Welcome to DeptEvents Pro | Registration for upcoming workshops is now OPEN | Check the portal daily!';
-        let notifShow = localStorage.getItem('sys_notif_show') !== 'false';
-        
-        // YOUR FIREBASE CONFIGURATION INTEGRATED
         const firebaseConfig = {
             apiKey: "AIzaSyBdwEMdKLdlJzNDXXaTQ3BMcMe5gvC_mbc",
             authDomain: "deptevents-2ff03.firebaseapp.com",
@@ -409,460 +265,270 @@
             projectId: "deptevents-2ff03",
             storageBucket: "deptevents-2ff03.firebasestorage.app",
             messagingSenderId: "80167810331",
-            appId: "1:80167810331:web:c72d334e2e0fd8e7940fbe",
-            measurementId: "G-D2ZNZQQGZN"
+            appId: "1:80167810331:web:c72d334e2e0fd8e7940fbe"
         };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-        let db = null;
+        let events = [], registrations = [], media = [], adminPass = "admin123", notifText = "", notifShow = true, galleryShow = true;
 
-        // Firebase Initialization
-        function initFirebase() {
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-                db = firebase.database();
-                
-                // Real-time listener for Events
-                db.ref('events').on('value', (snapshot) => {
-                    const data = snapshot.val();
-                    events = data ? Object.values(data) : [];
-                    localStorage.setItem('sys_events', JSON.stringify(events));
-                    refreshAll();
-                });
-
-                // Real-time listener for Registrations
-                db.ref('registrations').on('value', (snapshot) => {
-                    const data = snapshot.val();
-                    registrations = data ? Object.values(data) : [];
-                    localStorage.setItem('sys_regs', JSON.stringify(registrations));
-                    refreshAll();
-                });
-
-                // Real-time listener for Admin Password
-                db.ref('adminPass').on('value', (snapshot) => { 
-                    if(snapshot.val()) {
-                        adminPass = snapshot.val();
-                        localStorage.setItem('sys_admin_pass', adminPass);
-                    }
-                });
-
-                // Real-time listener for Notifications
-                db.ref('notif').on('value', (snapshot) => {
-                    const data = snapshot.val();
-                    if (data) {
-                        notifText = data.text;
-                        notifShow = data.show;
-                        localStorage.setItem('sys_notif_text', notifText);
-                        localStorage.setItem('sys_notif_show', notifShow);
-                        refreshAll();
-                    }
-                });
-            }
-        }
-
-        // Star Background Creation
-        function createStars() {
-            const container = document.getElementById('stars');
-            for (let i = 0; i < 150; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                const size = Math.random() * 2 + 1;
-                star.style.width = size + 'px';
-                star.style.height = size + 'px';
-                star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
-                container.appendChild(star);
-            }
-        }
-
-        function saveDB() {
-            localStorage.setItem('sys_events', JSON.stringify(events));
-            localStorage.setItem('sys_regs', JSON.stringify(registrations));
-            localStorage.setItem('sys_admin_pass', adminPass);
-            localStorage.setItem('sys_notif_text', notifText);
-            localStorage.setItem('sys_notif_show', notifShow);
-
-            if (db) {
-                db.ref('events').set(events);
-                db.ref('registrations').set(registrations);
-                db.ref('adminPass').set(adminPass);
-                db.ref('notif').set({ text: notifText, show: notifShow });
-            }
-            refreshAll();
-        }
-
-        // Auto-Cleanup: Delete events older than 3 hours after expiration
-        function autoCleanup() {
-            const now = new Date().getTime();
-            const threeHoursInMs = 3 * 60 * 60 * 1000;
-            const originalCount = events.length;
-            
-            events = events.filter(ev => {
-                const deadlineTime = new Date(ev.deadline).getTime();
-                const expiryWithBuffer = deadlineTime + threeHoursInMs;
-                return now < expiryWithBuffer;
+        function initData() {
+            db.ref('events').on('value', snap => { events = snap.val() ? Object.values(snap.val()) : []; refreshAll(); });
+            db.ref('registrations').on('value', snap => { registrations = snap.val() ? Object.values(snap.val()) : []; renderAdminRegs(); });
+            db.ref('media').on('value', snap => { media = snap.val() ? Object.values(snap.val()) : []; renderMedia(); });
+            db.ref('settings').on('value', snap => {
+                const s = snap.val() || {};
+                adminPass = s.pass || "admin123";
+                notifText = s.notifText || "Welcome to DeptEvents Pro 2026!";
+                notifShow = s.notifShow !== false;
+                galleryShow = s.galleryShow !== false;
+                refreshUI();
             });
-
-            if (events.length !== originalCount) {
-                const activeEventIds = events.map(e => e.id);
-                registrations = registrations.filter(r => activeEventIds.includes(r.eventId));
-                saveDB();
-            }
         }
 
-        // View Controller
-        function showView(viewId) {
+        function showView(view) {
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
-            setTimeout(() => {
-                document.getElementById(viewId).classList.add('active');
-            }, 50);
+            setTimeout(() => document.getElementById(view).classList.add('active'), 50);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            const icon = document.getElementById('menu-icon');
-            menu.classList.toggle('open');
-            icon.classList.toggle('fa-bars');
-            icon.classList.toggle('fa-times');
+        function showAdminTab(tab) {
+            ['events', 'media', 'settings'].forEach(t => document.getElementById('admin-tab-' + t).classList.add('hidden'));
+            document.getElementById('admin-tab-' + tab).classList.remove('hidden');
         }
 
-        function refreshAll() {
-            renderHomeEvents();
-            populateRegDropdown();
-            renderAdminEvents();
-            renderAdminRegs();
-            renderNotifBar();
-        }
+        function refreshAll() { renderHomeEvents(); populateRegDropdown(); renderAdminEvents(); }
 
-        function renderNotifBar() {
+        function refreshUI() {
             const bar = document.getElementById('notif-bar');
-            const txt = document.getElementById('notif-text');
-            const toggleBtn = document.getElementById('notif-toggle-btn');
-            const input = document.getElementById('notif-input');
-
-            txt.innerText = notifText;
-            input.value = notifText;
+            document.getElementById('notif-text').innerText = notifText;
+            document.getElementById('notif-input').value = notifText;
+            notifShow ? bar.classList.remove('hidden') : bar.classList.add('hidden');
             
-            if (notifShow) {
-                bar.classList.remove('hidden');
-                toggleBtn.innerText = "Hide Bar";
-                toggleBtn.classList.replace('bg-emerald-500/20', 'bg-rose-500/20');
-                toggleBtn.classList.replace('text-emerald-500', 'text-rose-500');
-            } else {
-                bar.classList.add('hidden');
-                toggleBtn.innerText = "Show Bar";
-                toggleBtn.classList.replace('bg-rose-500/20', 'bg-emerald-500/20');
-                toggleBtn.classList.replace('text-rose-500', 'text-emerald-500');
-            }
+            const nBtn = document.getElementById('notif-toggle-btn');
+            nBtn.innerText = notifShow ? "Hide Bar" : "Show Bar";
+            nBtn.className = notifShow ? "px-6 py-4 rounded-2xl font-black uppercase border border-rose-500/30 text-rose-500" : "px-6 py-4 rounded-2xl font-black uppercase border border-emerald-500/30 text-emerald-500";
+            
+            const gBtn = document.getElementById('gallery-toggle-btn');
+            gBtn.innerText = galleryShow ? "Hide Gallery" : "Show Gallery";
+            gBtn.className = galleryShow ? "px-6 py-2 rounded-xl text-[10px] font-black uppercase border border-rose-500 text-rose-500" : "px-6 py-2 rounded-xl text-[10px] font-black uppercase border border-emerald-500 text-emerald-500";
+            
+            galleryShow ? document.getElementById('home-gallery-section').classList.remove('hidden') : document.getElementById('home-gallery-section').classList.add('hidden');
         }
 
         function renderHomeEvents() {
             const grid = document.getElementById('events-grid');
-            const now = new Date().getTime();
-            grid.innerHTML = '';
-
-            if (events.length === 0) {
-                grid.innerHTML = `<div class="col-span-full py-32 text-center glass rounded-3xl border-2 border-dashed border-white/5"><i class="fas fa-calendar-times text-6xl text-white/5 mb-6"></i><p class="orbitron text-white/20 font-black uppercase tracking-[0.5em]">No Events Scheduled</p></div>`;
-                return;
-            }
-
+            grid.innerHTML = "";
+            const now = Date.now();
             events.forEach(ev => {
-                const deadlineTime = new Date(ev.deadline).getTime();
-                const isExpired = now > deadlineTime;
-                const timeLeft = deadlineTime - now;
-                
-                let countdownHTML = "";
-                if (isExpired) {
-                    countdownHTML = `<span class="bg-rose-500/20 text-rose-500 border border-rose-500/30 px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-tighter">Registration Closed</span>`;
-                } else {
-                    const d = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                    const h = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const m = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                    const s = Math.floor((timeLeft % (1000 * 60)) / 1000);
-                    countdownHTML = `<div class="text-right"><span class="block text-[8px] text-indigo-400 font-black uppercase tracking-widest leading-none mb-1">Closes In</span><span class="orbitron text-indigo-100 text-xs">${d}d ${h}h ${m}m ${s}s</span></div>`;
+                const deadline = new Date(ev.deadline).getTime();
+                const expired = now > deadline;
+                const timeLeft = deadline - now;
+                let countdown = "";
+                if (expired) countdown = `<span class="text-rose-500 text-[10px] font-black uppercase">Registration Closed</span>`;
+                else {
+                    const d = Math.floor(timeLeft / 864e5), h = Math.floor((timeLeft % 864e5) / 36e5), m = Math.floor((timeLeft % 36e5) / 6e4);
+                    countdown = `<span class="text-indigo-400 text-[10px] font-black uppercase">Closes: ${d}d ${h}h ${m}m</span>`;
                 }
-
                 grid.innerHTML += `
-                    <div class="glass rounded-3xl p-8 group hover:shadow-[0_0_40px_rgba(99,102,241,0.1)] transition-all ${isExpired ? 'opacity-60' : ''}">
-                        <div class="flex justify-between items-start mb-8">
-                            <span class="bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest">${ev.category}</span>
-                            ${countdownHTML}
+                    <div class="glass p-8 rounded-3xl relative overflow-hidden group">
+                        <div class="flex justify-between items-start mb-6">
+                            <span class="bg-indigo-600/20 text-indigo-300 px-3 py-1 rounded-lg text-[9px] font-black uppercase">${ev.category}</span>
+                            ${countdown}
                         </div>
-                        <h3 class="orbitron text-xl font-black text-white mb-6 leading-tight group-hover:text-indigo-400 transition">${ev.title}</h3>
-                        <div class="space-y-4 text-xs font-medium text-gray-400 mb-10">
-                            <p class="flex items-center"><i class="fas fa-calendar-alt w-6 text-indigo-500"></i> ${ev.date} @ ${ev.time}</p>
-                            <p class="flex items-center"><i class="fas fa-map-marker-alt w-6 text-indigo-500"></i> ${ev.location}</p>
-                            <p class="text-[10px] leading-relaxed italic border-t border-white/5 pt-4 opacity-70">${ev.desc}</p>
+                        <h3 class="orbitron text-xl font-black text-white mb-4">${ev.title}</h3>
+                        <div class="space-y-3 text-xs text-gray-400 mb-8">
+                            <p><i class="fas fa-calendar-alt w-6 text-indigo-500"></i> ${ev.date} @ ${ev.time}</p>
+                            <p><i class="fas fa-map-marker-alt w-6 text-indigo-500"></i> ${ev.location}</p>
                         </div>
-                        <button onclick="registerClick(${ev.id})" ${isExpired ? 'disabled' : ''} class="w-full py-4 rounded-xl orbitron font-bold text-[10px] uppercase tracking-[0.2em] transition-all active:scale-95 ${isExpired ? 'bg-white/5 text-white/20 cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-[0_0_15px_rgba(79,70,229,0.3)]'}">
-                            ${isExpired ? 'Registration Closed' : 'Register Now'}
-                        </button>
+                        <button onclick="registerClick(${ev.id})" ${expired ? 'disabled' : ''} class="w-full py-4 rounded-xl font-black text-[10px] uppercase transition ${expired ? 'bg-white/5 text-white/20' : 'bg-indigo-600 text-white hover:bg-indigo-500'}">${expired ? 'Closed' : 'Register Now'}</button>
                     </div>`;
             });
         }
 
-        function populateRegDropdown() {
-            const select = document.getElementById('reg-event-select');
-            select.innerHTML = '<option value="" class="bg-slate-900">-- Select Event --</option>';
-            const now = new Date().getTime();
-            events.forEach(ev => {
-                if (now < new Date(ev.deadline).getTime()) {
-                    select.innerHTML += `<option value="${ev.id}" class="bg-slate-900">${ev.title}</option>`;
-                }
+        function renderMedia() {
+            const homeGrid = document.getElementById('home-media-grid');
+            const adminTable = document.getElementById('admin-media-table');
+            homeGrid.innerHTML = ""; adminTable.innerHTML = "";
+            media.forEach(m => {
+                const isVid = m.type === 'video';
+                homeGrid.innerHTML += `
+                    <div class="glass rounded-2xl overflow-hidden media-card cursor-pointer group relative aspect-square" onclick="openMediaModal('${m.url}', '${m.type}')">
+                        ${isVid ? `<video class="w-full h-full object-cover opacity-50"><source src="${m.url}"></video>` : `<img src="${m.url}" class="w-full h-full object-cover opacity-80 group-hover:scale-110 transition duration-500">`}
+                        <div class="overlay absolute inset-0 bg-indigo-900/40 opacity-0 flex flex-col items-center justify-center transition">
+                            <div class="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center text-white mb-3">
+                                <i class="fas ${isVid ? 'fa-play' : 'fa-search-plus'}"></i>
+                            </div>
+                            <span class="text-[10px] font-black uppercase text-white tracking-widest">${m.title}</span>
+                        </div>
+                    </div>`;
+                adminTable.innerHTML += `
+                    <tr>
+                        <td class="px-8 py-5 text-white font-bold">${m.title}</td>
+                        <td class="px-8 py-5 uppercase text-[10px] font-black">${m.type}</td>
+                        <td class="px-8 py-5"><button onclick="deleteMedia(${m.id})" class="text-rose-500"><i class="fas fa-trash"></i></button></td>
+                    </tr>`;
             });
         }
 
-        function registerClick(id) {
-            showView('register-view');
-            document.getElementById('reg-event-select').value = id;
+        document.getElementById('upload-media-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const file = document.getElementById('media-file').files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                const newMedia = {
+                    id: Date.now(),
+                    title: document.getElementById('media-title').value,
+                    type: document.getElementById('media-type').value,
+                    url: reader.result
+                };
+                db.ref('media/' + newMedia.id).set(newMedia);
+                e.target.reset();
+                alert("Media Uploaded Successfully!");
+            };
+        });
+
+        function deleteMedia(id) { if (confirm("Delete this media?")) db.ref('media/' + id).remove(); }
+        function toggleGalleryVisibility() { db.ref('settings/galleryShow').set(!galleryShow); }
+        function openMediaModal(url, type) {
+            const container = document.getElementById('video-container');
+            if (type === 'video') {
+                container.innerHTML = `<video src="${url}" controls autoplay class="w-full h-full max-h-screen"></video>`;
+            } else {
+                container.innerHTML = `<img src="${url}" class="max-w-full max-h-screen object-contain mx-auto shadow-2xl rounded-xl">`;
+            }
+            document.getElementById('video-modal').classList.remove('hidden');
+        }
+        function closeVideoModal() {
+            document.getElementById('video-modal').classList.add('hidden');
+            document.getElementById('video-container').innerHTML = "";
         }
 
-        // Form Handlers
-        document.getElementById('registration-form').addEventListener('submit', function(e) {
+        document.getElementById('add-event-form').addEventListener('submit', e => {
             e.preventDefault();
-            const eventId = parseInt(document.getElementById('reg-event-select').value);
-            const event = events.find(ev => ev.id === eventId);
-            const newReg = {
-                id: Date.now(),
-                eventId,
-                eventName: event.title,
+            const id = Date.now();
+            const event = {
+                id, title: document.getElementById('ev-title').value,
+                category: document.getElementById('ev-category').value,
+                date: document.getElementById('ev-date').value,
+                time: document.getElementById('ev-time').value,
+                deadline: document.getElementById('ev-deadline').value,
+                location: document.getElementById('ev-location').value,
+                desc: document.getElementById('ev-desc').value
+            };
+            db.ref('events/' + id).set(event);
+            e.target.reset();
+            alert("Event Published!");
+        });
+
+        function renderAdminEvents() {
+            const table = document.getElementById('admin-events-table');
+            table.innerHTML = "";
+            events.forEach(ev => {
+                const count = registrations.filter(r => r.eventId == ev.id).length;
+                table.innerHTML += `
+                    <tr>
+                        <td class="px-8 py-5 text-white font-bold">${ev.title}<br><span class="text-[9px] text-gray-500 font-normal uppercase">${ev.category}</span></td>
+                        <td class="px-8 py-5 text-xs">${ev.location}</td>
+                        <td class="px-8 py-5"><span class="bg-indigo-600/20 px-2 py-1 rounded text-indigo-400 font-bold">${count}</span></td>
+                        <td class="px-8 py-5">
+                            <button onclick="exportSpecific(${ev.id}, '${ev.title}')" class="text-emerald-500 mr-4"><i class="fas fa-file-excel"></i></button>
+                            <button onclick="deleteEvent(${ev.id})" class="text-rose-500"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function renderAdminRegs() {
+            const table = document.getElementById('admin-regs-table');
+            const term = document.getElementById('admin-reg-search').value.toLowerCase();
+            const filtered = registrations.filter(r => r.name.toLowerCase().includes(term) || r.studentId.toLowerCase().includes(term));
+            table.innerHTML = "";
+            filtered.forEach(r => {
+                table.innerHTML += `
+                    <tr>
+                        <td class="px-8 py-5 text-white font-bold">${r.name}<br><span class="text-[10px] font-mono text-gray-500">${r.studentId}</span></td>
+                        <td class="px-8 py-5 text-xs text-indigo-400 font-bold">${r.eventName}</td>
+                        <td class="px-8 py-5 text-[10px] text-gray-500 uppercase">${new Date(r.date).toLocaleDateString()}</td>
+                        <td class="px-8 py-5"><button onclick="deleteReg(${r.id})" class="text-rose-500/30 hover:text-rose-500"><i class="fas fa-trash"></i></button></td>
+                    </tr>`;
+            });
+        }
+
+        function exportSpecific(id, title) {
+            const list = registrations.filter(r => r.eventId == id);
+            if (!list.length) return alert("No registrations for this event.");
+            downloadCSV(list, `Participants_${title.replace(/\s+/g, '_')}.csv`);
+        }
+
+        function exportCSV() {
+            if (!registrations.length) return alert("No registrations found.");
+            downloadCSV(registrations, "All_Registrations.csv");
+        }
+
+        function downloadCSV(data, fileName) {
+            let csv = "Full Name,Student ID,Event,Email,Phone,Date\n";
+            data.forEach(r => {
+                csv += `"${r.name}","${r.studentId}","${r.eventName}","${r.email}","${r.phone}","${new Date(r.date).toLocaleString().replace(/,/g,'')}"\n`;
+            });
+            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            link.click();
+        }
+
+        function checkStudentStatus() {
+            const sid = document.getElementById('search-student-id').value.trim().toUpperCase();
+            if(!sid) return;
+            const res = document.getElementById('status-results');
+            const found = registrations.filter(r => r.studentId.toUpperCase() === sid);
+            if (!found.length) res.innerHTML = `<p class="text-rose-500 text-sm font-bold">No registrations found.</p>`;
+            else {
+                let h = `<h4 class="text-[10px] text-indigo-400 font-black uppercase mb-4">Registrations for ${sid}:</h4>`;
+                found.forEach(r => h += `<div class="bg-emerald-500/10 p-4 rounded-xl text-white font-bold mb-2">${r.eventName}</div>`);
+                res.innerHTML = h;
+            }
+        }
+
+        document.getElementById('registration-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const evId = document.getElementById('reg-event-select').value;
+            const ev = events.find(x => x.id == evId);
+            const reg = {
+                id: Date.now(), eventId: evId, eventName: ev.title,
                 name: document.getElementById('reg-name').value,
                 studentId: document.getElementById('reg-id').value,
                 email: document.getElementById('reg-email').value,
                 phone: document.getElementById('reg-phone').value,
                 date: new Date().toISOString()
             };
-            registrations.push(newReg);
-            saveDB();
-            alert('Registration Successful: ' + newReg.name + ' for ' + event.title);
-            this.reset();
-            showView('home-view');
+            db.ref('registrations/' + reg.id).set(reg);
+            alert("Registration Successful!"); e.target.reset(); showView('home-view');
         });
 
-        // Admin Auth
-        function loginAdmin() {
-            if (document.getElementById('admin-pass').value === adminPass) {
-                document.getElementById('admin-login-box').classList.add('hidden');
-                document.getElementById('admin-dashboard').classList.remove('hidden');
-            } else {
-                document.getElementById('login-error').classList.remove('hidden');
-            }
+        function populateRegDropdown() {
+            const s = document.getElementById('reg-event-select');
+            s.innerHTML = '<option value="">Select Event...</option>';
+            events.forEach(ev => s.innerHTML += `<option value="${ev.id}">${ev.title}</option>`);
         }
 
-        function logoutAdmin() {
-            document.getElementById('admin-login-box').classList.remove('hidden');
-            document.getElementById('admin-dashboard').classList.add('hidden');
-            document.getElementById('admin-pass').value = '';
-        }
+        function registerClick(id) { showView('register-view'); document.getElementById('reg-event-select').value = id; }
+        function deleteEvent(id) { if(confirm("Delete Event?")) { db.ref('events/'+id).remove(); db.ref('registrations').once('value', snap => { const rs = snap.val()||{}; for(let k in rs) if(rs[k].eventId == id) db.ref('registrations/'+k).remove(); }); } }
+        function deleteReg(id) { if(confirm("Delete Student?")) db.ref('registrations/'+id).remove(); }
+        function loginAdmin() { if(document.getElementById('admin-pass').value === adminPass) { document.getElementById('admin-login-box').classList.add('hidden'); document.getElementById('admin-dashboard').classList.remove('hidden'); } else document.getElementById('login-error').classList.remove('hidden'); }
+        function logoutAdmin() { document.getElementById('admin-login-box').classList.remove('hidden'); document.getElementById('admin-dashboard').classList.add('hidden'); }
+        function changeAdminPassword() { const p = document.getElementById('new-admin-pass').value; if(p.length<5) return; db.ref('settings/pass').set(p); alert("Password Updated!"); }
+        function updateNotif() { db.ref('settings/notifText').set(document.getElementById('notif-input').value); }
+        function toggleNotifVis() { db.ref('settings/notifShow').set(!notifShow); }
+        function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
 
-        function showAdminTab(tab) {
-            document.getElementById('admin-tab-events').classList.add('hidden');
-            document.getElementById('admin-tab-settings').classList.add('hidden');
-            document.getElementById('admin-tab-' + tab).classList.remove('hidden');
-        }
+        const createStars = () => { const c = document.getElementById('stars'); for(let i=0; i<150; i++) { const s = document.createElement('div'); s.className='star'; s.style.left=Math.random()*100+'%'; s.style.top=Math.random()*100+'%'; const z=Math.random()*2+1; s.style.width=z+'px'; s.style.height=z+'px'; s.style.setProperty('--duration', (Math.random()*3+2)+'s'); c.appendChild(s); } };
 
-        function changeAdminPassword() {
-            const newPass = document.getElementById('new-admin-pass').value;
-            if (newPass.length < 5) return alert("Password must be at least 5 characters.");
-            adminPass = newPass;
-            saveDB();
-            alert("Admin password updated successfully.");
-            document.getElementById('new-admin-pass').value = '';
-        }
-
-        function updateNotif() {
-            notifText = document.getElementById('notif-input').value;
-            saveDB();
-            alert("Notification bar updated.");
-        }
-
-        function toggleNotifVis() {
-            notifShow = !notifShow;
-            saveDB();
-        }
-
-        // Admin Event Logic
-        document.getElementById('add-event-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const newEv = {
-                id: Date.now(),
-                title: document.getElementById('ev-title').value,
-                category: document.getElementById('ev-category').value,
-                location: document.getElementById('ev-location').value,
-                date: document.getElementById('ev-date').value,
-                time: document.getElementById('ev-time').value,
-                deadline: document.getElementById('ev-deadline').value,
-                desc: document.getElementById('ev-desc').value
-            };
-            events.push(newEv);
-            saveDB();
-            this.reset();
-            alert('New event published successfully.');
-        });
-
-        function renderAdminEvents() {
-            const tbody = document.getElementById('admin-events-table');
-            const now = new Date().getTime();
-            tbody.innerHTML = '';
-            events.forEach(ev => {
-                const count = registrations.filter(r => r.eventId === ev.id).length;
-                const isExpired = now > new Date(ev.deadline).getTime();
-                tbody.innerHTML += `
-                    <tr class="hover:bg-white/5 transition">
-                        <td class="px-8 py-5">
-                            <div class="font-bold text-white text-sm uppercase">${ev.title}</div>
-                            <div class="text-[9px] text-gray-500 uppercase tracking-widest">${ev.category} • ${ev.date}</div>
-                        </td>
-                        <td class="px-8 py-5 text-center">
-                            <span class="bg-indigo-600/20 text-indigo-400 px-3 py-1 rounded-full font-black text-[10px]">${count} Students</span>
-                        </td>
-                        <td class="px-8 py-5">
-                            <span class="text-[9px] font-black uppercase tracking-widest ${isExpired ? 'text-rose-500' : 'text-emerald-500'}">
-                                ${isExpired ? 'Expired' : 'Active'}
-                            </span>
-                        </td>
-                        <td class="px-8 py-5">
-                            <div class="flex items-center space-x-4">
-                                <button onclick="exportSpecificEvent(${ev.id}, '${ev.title.replace(/'/g, "\\'")}')" title="Export Participants" class="text-emerald-400 hover:text-white transition"><i class="fas fa-file-excel"></i></button>
-                                <button onclick="openDeadlineModal(${ev.id}, '${ev.deadline}')" title="Edit Deadline" class="text-indigo-400 hover:text-white transition"><i class="fas fa-clock"></i></button>
-                                <button onclick="deleteEvent(${ev.id})" title="Delete Event" class="text-rose-500/50 hover:text-rose-500 transition"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>`;
-            });
-        }
-
-        function deleteEvent(id) {
-            if (confirm('Delete this event? All associated student registrations will be removed.')) {
-                events = events.filter(e => e.id !== id);
-                registrations = registrations.filter(r => r.eventId !== id);
-                saveDB();
-            }
-        }
-
-        function openDeadlineModal(id, deadline) {
-            document.getElementById('edit-event-id').value = id;
-            document.getElementById('edit-new-deadline').value = deadline;
-            document.getElementById('edit-deadline-modal').classList.remove('hidden');
-        }
-
-        function closeDeadlineModal() { document.getElementById('edit-deadline-modal').classList.add('hidden'); }
-
-        function saveNewDeadline() {
-            const id = parseInt(document.getElementById('edit-event-id').value);
-            const ev = events.find(e => e.id === id);
-            if (ev) {
-                ev.deadline = document.getElementById('edit-new-deadline').value;
-                saveDB();
-                closeDeadlineModal();
-                alert('Event registration deadline updated.');
-            }
-        }
-
-        function checkStudentStatus() {
-            const sid = document.getElementById('search-student-id').value.trim().toUpperCase();
-            const res = document.getElementById('status-results');
-            if (!sid) return alert("Student ID is required.");
-            const found = registrations.filter(r => r.studentId.toUpperCase() === sid);
-            if (found.length === 0) {
-                res.innerHTML = `<div class="bg-rose-500/10 border border-rose-500/20 p-6 rounded-2xl"><p class="text-rose-400 font-bold orbitron text-sm">No Registrations Found</p><p class="text-gray-400 text-xs mt-2 uppercase tracking-widest">Double-check your ID or register for an event first.</p></div>`;
-            } else {
-                let html = `<h4 class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-4">Results for ${sid}:</h4>`;
-                found.forEach(r => {
-                    html += `<div class="bg-emerald-500/10 border border-emerald-500/20 p-5 rounded-2xl flex justify-between items-center"><div class="text-sm font-bold text-white uppercase">${r.eventName}</div><span class="text-[9px] text-emerald-400 font-black uppercase tracking-widest">Registered</span></div>`;
-                });
-                res.innerHTML = html;
-            }
-        }
-
-        function renderAdminRegs() {
-            const tbody = document.getElementById('admin-regs-table');
-            const term = (document.getElementById('admin-reg-search').value || '').toLowerCase();
-            const filtered = registrations.filter(r => r.studentId.toLowerCase().includes(term) || r.name.toLowerCase().includes(term) || r.eventName.toLowerCase().includes(term));
-            tbody.innerHTML = '';
-            filtered.forEach(r => {
-                tbody.innerHTML += `
-                    <tr class="hover:bg-white/5 transition">
-                        <td class="px-8 py-5">
-                            <div class="text-sm font-bold text-white uppercase">${r.name}</div>
-                            <div class="text-[9px] text-gray-500 font-mono uppercase">${r.studentId}</div>
-                        </td>
-                        <td class="px-8 py-5 text-sm text-indigo-400 uppercase font-bold">${r.eventName}</td>
-                        <td class="px-8 py-5 text-[9px] text-gray-400 uppercase font-black">${new Date(r.date).toLocaleDateString()}</td>
-                        <td class="px-8 py-5">
-                            <button onclick="deleteReg(${r.id})" class="text-rose-500/30 hover:text-rose-500 p-2"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>`;
-            });
-        }
-
-        function deleteReg(id) {
-            if (confirm('Delete this registration?')) {
-                registrations = registrations.filter(r => r.id !== id);
-                saveDB();
-            }
-        }
-
-        function exportSpecificEvent(eventId, title) {
-            const filtered = registrations.filter(r => r.eventId === eventId);
-            if (filtered.length === 0) return alert('No students registered for this event yet.');
-            generateCSV(filtered, `participants_${title.replace(/\s+/g, '_')}.csv`);
-        }
-
-        function exportCSV() {
-            const term = (document.getElementById('admin-reg-search').value || '').toLowerCase();
-            const filtered = registrations.filter(r => 
-                r.studentId.toLowerCase().includes(term) || 
-                r.name.toLowerCase().includes(term) || 
-                r.eventName.toLowerCase().includes(term)
-            );
-
-            if (filtered.length === 0) return alert('No records found matching your search.');
-            const fileName = term ? `report_${term.replace(/\s+/g, '_')}.csv` : 'all_registrations.csv';
-            generateCSV(filtered, fileName);
-        }
-
-        function generateCSV(data, fileName) {
-            // Standard CSV Header
-            let csv = "Full Name,Student ID,Event Registered,Email Address,Phone Number,Registration Date\n";
-            
-            data.forEach(r => {
-                const dateStr = new Date(r.date).toLocaleString().replace(/,/g, '');
-                // Escape quotes and wrap in quotes for Excel safety
-                const row = [
-                    r.name,
-                    r.studentId,
-                    r.eventName,
-                    r.email,
-                    r.phone,
-                    dateStr
-                ].map(val => `"${String(val).replace(/"/g, '""')}"`).join(',');
-                csv += row + "\n";
-            });
-            
-            // Add UTF-8 BOM so Excel opens it correctly with columns
-            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            const url = URL.createObjectURL(blob);
-            
-            link.setAttribute("href", url);
-            link.setAttribute("download", fileName);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        // Initialization
-        createStars();
-        autoCleanup();
-        initFirebase();
-        refreshAll();
-        setInterval(() => {
-            if (document.getElementById('home-view').classList.contains('active')) renderHomeEvents();
-            autoCleanup();
-        }, 1000);
+        createStars(); initData();
+        setInterval(renderHomeEvents, 60000);
     </script>
 </body>
 </html>
